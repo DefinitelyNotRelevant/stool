@@ -75,8 +75,6 @@ public class MapsMarkerActivity extends AppCompatActivity
 
          */
     }
-
-    @Override
     // [END maps_marker_get_map_async]
     // [END_EXCLUDE]
 
@@ -103,6 +101,9 @@ public class MapsMarkerActivity extends AppCompatActivity
             }
         }
     }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
         /*
         // [START_EXCLUDE silent]
         // Add a marker in Sydney, Australia,
