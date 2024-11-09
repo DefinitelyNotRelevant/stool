@@ -14,8 +14,12 @@
 
 package com.example.mapwithmarker;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,6 +27,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 /**
  * An activity that displays a Google map with a marker (pin) to indicate a particular location.
@@ -31,19 +42,41 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class MapsMarkerActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private FusedLocationProviderClient fusedLocationClient;
+
     // [START_EXCLUDE]
     // [START maps_marker_get_map_async]
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Retrieve the content view that renders the map.
-        setContentView(R.layout.activity_maps);
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        // Check for location permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        } else {
+            //getUserLocation();
+        }
+
+        setContentView(R.layout.activity_maps);
+        TextView textView = findViewById(R.id.editText);
+        textView.setText("Hello, this text is set programmatically!");
+        /*
         // Get the SupportMapFragment and request notification when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+         */
     }
+
+    @Override
     // [END maps_marker_get_map_async]
     // [END_EXCLUDE]
 
@@ -60,7 +93,17 @@ public class MapsMarkerActivity extends AppCompatActivity
     // [END_EXCLUDE]
     // [START maps_marker_on_map_ready_add_marker]
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //getUserLocation();
+            } else {
+                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+        /*
         // [START_EXCLUDE silent]
         // Add a marker in Sydney, Australia,
         // and move the map's camera to the same location.
@@ -72,6 +115,8 @@ public class MapsMarkerActivity extends AppCompatActivity
         // [START_EXCLUDE silent]
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         // [END_EXCLUDE]
+
+         */
     }
     // [END maps_marker_on_map_ready_add_marker]
 }

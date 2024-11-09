@@ -10,6 +10,7 @@ appcompat = "1.7.0"
 junit = "4.13.2"
 androidxTestExtJunit = "1.2.1"
 espressoCore = "3.6.1"
+playServicesLocation = "21.3.0"
 
 [libraries]
 playServicesMaps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
@@ -18,3 +19,4 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidxTestExtJunit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
 espressoCore = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+playServicesLocation = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }

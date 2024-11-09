@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.playServicesMaps)
     implementation(platform(libs.kotlinBom))
     implementation(libs.appcompat)
+    implementation(libs.playServicesLocation)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidxTestExtJunit)
     androidTestImplementation(libs.espressoCore)
