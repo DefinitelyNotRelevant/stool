@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
+
 import android.os.Parcel;
 import android.util.Log;
 import android.util.Pair;
@@ -104,6 +105,12 @@ public class MapsMarkerActivity extends AppCompatActivity
                         input.setLongitude(longitude);
                         Toast.makeText(MapsMarkerActivity.this, "Searching for: " + query, Toast.LENGTH_SHORT).show();
                         findLots(input);
+                        LatLng latlng = new LatLng(latitude, longitude);
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, 15));
+                        map.addMarker(new MarkerOptions()
+                                .position(latlng)
+                                .title(query));
+
                     }
                 } catch (IOException e) {
                     Toast.makeText(MapsMarkerActivity.this, "None found for: " + query, Toast.LENGTH_SHORT).show();
@@ -161,6 +168,7 @@ public class MapsMarkerActivity extends AppCompatActivity
                     .title(marker.first));
         }
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(markers.get(0).second.latitude, markers.get(0).second.longitude), 12));
+        map = googleMap;
     }
 
     @SuppressLint("MissingPermission")
@@ -189,7 +197,7 @@ public class MapsMarkerActivity extends AppCompatActivity
     public List<Pair<String, LatLng>> findLots(Location location) throws IOException {
         System.out.println(location);
         String url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" +
-                "parking+lots+nearby+" + location.getLatitude() + "+" + location.getLongitude() + "&key=CUSTOM_KEY";
+                "parking+lots+nearby+" + location.getLatitude() + "+" + location.getLongitude() + "&key=USE_API_KEY";
 
         Future<List<Pair<String, LatLng>>> future = executorService.submit(() -> {
             List<Pair<String, LatLng>> result = new ArrayList<>();
