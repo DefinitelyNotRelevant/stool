@@ -11,6 +11,9 @@ junit = "4.13.2"
 androidxTestExtJunit = "1.2.1"
 espressoCore = "3.6.1"
 playServicesLocation = "21.3.0"
+places = "2.6.0"
+okhttp = "4.9.0"
+
 
 [libraries]
 playServicesMaps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
@@ -20,3 +23,5 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidxTestExtJunit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
 espressoCore = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 playServicesLocation = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
+okhttp = {group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp"}

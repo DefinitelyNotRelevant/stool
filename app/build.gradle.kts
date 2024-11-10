@@ -46,10 +46,12 @@ android {
 }
 
 dependencies {
+    implementation(libs.okhttp)
     implementation(libs.playServicesMaps)
     implementation(platform(libs.kotlinBom))
     implementation(libs.appcompat)
     implementation(libs.playServicesLocation)
+    implementation(libs.places)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidxTestExtJunit)
     androidTestImplementation(libs.espressoCore)
