@@ -1,17 +1,3 @@
-// Copyright 2020 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 package com.example.mapwithmarker;
 
 import android.Manifest;
@@ -40,20 +26,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.Place;
-import com.google.android.libraries.places.api.model.PlaceLikelihood;
-import com.google.android.libraries.places.api.model.RectangularBounds;
-import com.google.android.libraries.places.api.net.FetchPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
-import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
-import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
-
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -78,10 +51,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/**
- * An activity that displays a Google map with a marker (pin) to indicate a particular location.
- */
-
 interface LocationCallback {
     void onLocationReceived(Location location) throws IOException;
 }
@@ -99,21 +68,14 @@ public class MapsMarkerActivity extends AppCompatActivity
     private static final OkHttpClient client = new OkHttpClient();
     private static final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-
-
-
-    // [START_EXCLUDE]
-    // [START maps_marker_get_map_async]
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Retrieve the content view that renders the map.
 
         Places.initialize(getApplicationContext(), "AIzaSyCyk9ckBKQBl2deSh4NjX7plTYe_8l-JCQ");
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Check for location permissions
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -130,10 +92,8 @@ public class MapsMarkerActivity extends AppCompatActivity
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Handle search query submission
                 Geocoder geocoder = new Geocoder(MapsMarkerActivity.this, Locale.getDefault());
                 try {
-                    // Get a list of addresses from the Geocoder
                     List<Address> addresses = geocoder.getFromLocationName(query, 1); // Get only the first result
                     if (addresses != null && !addresses.isEmpty()) {
                         Address address = addresses.get(0);
@@ -158,13 +118,6 @@ public class MapsMarkerActivity extends AppCompatActivity
                 return false;
             }
         });
-        /*
-        // Get the SupportMapFragment and request notification when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-         */
     }
 
     public void onLocationReceived(Location location) throws IOException {
@@ -176,10 +129,7 @@ public class MapsMarkerActivity extends AppCompatActivity
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
-    // [END maps_marker_get_map_async]
-    // [END_EXCLUDE]
 
-    // [START_EXCLUDE silent]
     /**
      * Manipulates the map when it's available.
      * The API invokes this callback when the map is ready to be used.
@@ -189,8 +139,7 @@ public class MapsMarkerActivity extends AppCompatActivity
      * Play services inside the SupportMapFragment. The API invokes this method after the user has
      * installed Google Play services and returned to the app.
      */
-    // [END_EXCLUDE]
-    // [START maps_marker_on_map_ready_add_marker]
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -211,7 +160,6 @@ public class MapsMarkerActivity extends AppCompatActivity
                     .position(marker.second)
                     .title(marker.first));
         }
-        // [START_EXCLUDE silent]
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(markers.get(0).second.latitude, markers.get(0).second.longitude), 12));
     }
 
@@ -243,7 +191,6 @@ public class MapsMarkerActivity extends AppCompatActivity
         String url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" +
                 "parking+lots+nearby+" + location.getLatitude() + "+" + location.getLongitude() + "&key=CUSTOM_KEY";
 
-        // Use submit to get a Future object
         Future<List<Pair<String, LatLng>>> future = executorService.submit(() -> {
             List<Pair<String, LatLng>> result = new ArrayList<>();
 
@@ -254,24 +201,20 @@ public class MapsMarkerActivity extends AppCompatActivity
             try (Response response = client.newCall(request).execute()) {
                 if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-                // Parse the response body to extract names and locations
                 String responseBody = response.body().string();
                 System.out.println("Response Body: " + responseBody);
 
                 JSONObject jsonObject = new JSONObject(responseBody);
                 JSONArray resultsArray = jsonObject.getJSONArray("results");
 
-                // Loop through the results and extract the name and location
                 for (int i = 0; i < resultsArray.length(); i++) {
                     JSONObject place = resultsArray.getJSONObject(i);
                     String name = place.getString("name");
-                    // Extract the location (latitude and longitude)
                     JSONObject loc = place.getJSONObject("geometry").getJSONObject("location");
                     double lat = loc.getDouble("lat");
                     double lng = loc.getDouble("lng");
                     System.out.println("Place " + i + ": " + name + " Lat: " + lat + " Lng: " + lng);
 
-                    // Add the name and LatLng pair to the result list
                     result.add(new Pair<>(name, new LatLng(lat, lng)));
                 }
             } catch (IOException | JSONException e) {
@@ -282,13 +225,10 @@ public class MapsMarkerActivity extends AppCompatActivity
         });
 
         try {
-            // Wait for the result and return it once it's available
-            return future.get();  // This will block until the task is done and result is returned
+            return future.get();
         } catch (Exception e) {
             e.printStackTrace();
-            return new ArrayList<>();  // Return an empty list if there's an error
+            return new ArrayList<>();
         }
     }
-    // [END maps_marker_on_map_ready_add_marker]
 }
-// [END maps_marker_on_map_ready]
