@@ -15,9 +15,15 @@
 package com.example.mapwithmarker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +41,10 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * An activity that displays a Google map with a marker (pin) to indicate a particular location.
  */
@@ -44,6 +54,7 @@ public class MapsMarkerActivity extends AppCompatActivity
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private FusedLocationProviderClient fusedLocationClient;
+    private SearchView searchView;
 
     // [START_EXCLUDE]
     // [START maps_marker_get_map_async]
@@ -61,12 +72,26 @@ public class MapsMarkerActivity extends AppCompatActivity
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
-            //getUserLocation();
+            getUserLocation();
         }
 
         setContentView(R.layout.activity_maps);
-        TextView textView = findViewById(R.id.editText);
-        textView.setText("Hello, this text is set programmatically!");
+
+        searchView = findViewById(R.id.searchBar);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Handle search query submission
+                Toast.makeText(MapsMarkerActivity.this, "Searching for: " + query, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         /*
         // Get the SupportMapFragment and request notification when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -95,7 +120,7 @@ public class MapsMarkerActivity extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //getUserLocation();
+                getUserLocation();
             } else {
                 Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
             }
@@ -118,6 +143,39 @@ public class MapsMarkerActivity extends AppCompatActivity
         // [END_EXCLUDE]
 
          */
+    }
+
+    @SuppressLint("MissingPermission")
+    public void getUserLocation() {
+        fusedLocationClient.getLastLocation()
+                .addOnCompleteListener(new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            Location location = task.getResult();
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
+
+                            // Display the location
+                            Toast.makeText(MapsMarkerActivity.this, "Latitude: " + latitude + ", Longitude: " + longitude, Toast.LENGTH_LONG).show();
+                            Geocoder geocoder = new Geocoder(MapsMarkerActivity.this, Locale.getDefault());
+                            try {
+                                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                                if (addresses != null && !addresses.isEmpty()) {
+                                    Address address = addresses.get(0);
+                                    String addressText = address.getAddressLine(0); // Full address
+                                    Toast.makeText(MapsMarkerActivity.this, addressText, Toast.LENGTH_LONG).show();
+                                } else {
+                                    Toast.makeText(MapsMarkerActivity.this, "Unable to find address", Toast.LENGTH_LONG).show();
+                                }
+                            } catch (IOException e) {
+                                Toast.makeText(MapsMarkerActivity.this, "Geocoder service not available", Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            Toast.makeText(MapsMarkerActivity.this, "Unable to get location", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
     // [END maps_marker_on_map_ready_add_marker]
 }
