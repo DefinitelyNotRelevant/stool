@@ -56,7 +56,7 @@ interface LocationCallback {
     void onLocationReceived(Location location) throws IOException;
 }
 
-// [START maps_marker_on_map_ready]
+
 public class MapsMarkerActivity extends AppCompatActivity
         implements OnMapReadyCallback, LocationCallback {
 
